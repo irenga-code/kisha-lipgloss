@@ -16,19 +16,73 @@
   
   <!-- CUSTOM STYLES -->
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- BASKET / WHATSAPP / ADMIN ADD-ONS (new elements only) -->
+  <style>
+    .kb-ask { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .kb-admin-foot { text-align: center; padding: 10px 0 4px; }
+    .kb-admin-foot a { font-size: 0.7rem; color: inherit; opacity: 0.35; text-decoration: none; letter-spacing: 1px; }
+    .kb-admin-foot a:hover { opacity: 0.8; }
+    .kb-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
+    .kb-item img { width: 58px; height: 58px; object-fit: cover; border-radius: 10px; }
+    .kb-item-info { flex: 1; min-width: 0; }
+    .kb-item-info h5 { margin: 0 0 6px; font-size: 0.92rem; }
+    .kb-qty { display: inline-flex; align-items: center; gap: 10px; }
+    .kb-qty button, .kb-remove { background: none; border: 1px solid rgba(0,0,0,0.15); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 0.75rem; }
+    .kb-remove { border: none; color: #D81B60; font-size: 0.95rem; }
+    .kb-empty { text-align: center; padding: 50px 10px; opacity: 0.75; }
+    .kb-empty i { font-size: 2rem; margin-bottom: 10px; color: #D81B60; }
+    .kb-note { font-size: 0.8rem; opacity: 0.7; text-align: center; margin: 14px 0 0; }
+    .kb-toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); background: #2b0f1b; color: #fff; padding: 12px 22px; border-radius: 40px; font-size: 0.88rem; opacity: 0; pointer-events: none; transition: all .3s; z-index: 100001; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .kb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .kb-ui, .kb-ui * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; cursor: auto; }
+    .kb-ui button, .kb-ui label { cursor: pointer; }
+    .kb-back { position: fixed; inset: 0; background: rgba(20,5,12,0.6); display: none; align-items: center; justify-content: center; z-index: 100000; padding: 16px; }
+    .kb-back.open { display: flex; }
+    .kb-box { background: #fff; color: #2b0f1b; border-radius: 18px; width: 100%; max-width: 560px; max-height: 85vh; overflow: auto; padding: 24px; position: relative; }
+    .kb-box h3 { margin: 0 0 14px; font-family: 'Playfair Display', serif; }
+    .kb-box p { font-size: 0.85rem; line-height: 1.5; }
+    .kb-box input[type=text], .kb-box input[type=password] { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.92rem; margin: 4px 0 12px; }
+    .kb-x { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 1.2rem; }
+    .kb-btn { background: #D81B60; color: #fff; border: none; border-radius: 30px; padding: 10px 20px; font-size: 0.88rem; font-weight: 600; }
+    .kb-btn.ghost { background: transparent; color: #D81B60; border: 1px solid #D81B60; }
+    .kb-err { color: #c62828; font-size: 0.82rem; min-height: 1em; }
+    .kb-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+    .kb-photo { text-align: center; font-size: 0.72rem; }
+    .kb-photo img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; display: block; margin-bottom: 4px; }
+    .kb-photo label { display: inline-block; margin-top: 4px; color: #D81B60; font-weight: 600; }
+    .kb-photo.pending img { outline: 3px solid #D4AF37; }
+    .kb-price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .kb-price-row span { flex: 1; font-size: 0.86rem; }
+    .kb-price-row input { flex: 1; margin: 0 !important; }
+    .kb-bar { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); background: #2b0f1b; color: #fff; border-radius: 40px; padding: 8px 10px; display: none; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; z-index: 99999; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 96vw; }
+    .kb-bar.open { display: flex; }
+    .kb-bar button { background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 30px; padding: 8px 14px; font-size: 0.8rem; }
+    .kb-bar button.on { background: #D81B60; }
+    .kb-bar button.pub { background: #D4AF37; color: #2b0f1b; font-weight: 700; }
+    .kb-bar .kb-status { font-size: 0.75rem; opacity: 0.8; padding: 0 8px; }
+    body.kb-editing .kb-editable { outline: 1px dashed rgba(216,27,96,0.7); outline-offset: 2px; cursor: text; }
+    body.kb-editing .kb-editable:focus { outline: 2px solid #D81B60; background: rgba(255,255,255,0.15); }
+    body.kb-editing img[data-kb-photo] { cursor: copy; }
+    .kb-show { max-width: 520px; margin: 0 auto; }
+    .kb-show-stage { position: relative; aspect-ratio: 4 / 5; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.15); background: #f5e6ec; }
+    .kb-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease; }
+    .kb-slide.active { opacity: 1; z-index: 1; }
+    .kb-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .kb-show-btn, .kb-show-expand { position: absolute; z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,0.85); color: #D81B60; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: background .2s; }
+    .kb-show-btn:hover, .kb-show-expand:hover { background: #fff; }
+    .kb-show-btn { top: 50%; transform: translateY(-50%); }
+    .kb-show-btn.prev { left: 14px; }
+    .kb-show-btn.next { right: 14px; }
+    .kb-show-expand { top: 14px; right: 14px; width: 38px; height: 38px; font-size: 0.85rem; }
+    .kb-show-count { text-align: center; margin-top: 14px; font-size: 0.85rem; letter-spacing: 2px; opacity: 0.7; }
+  </style>
 </head>
 <body>
 
   <!-- CUSTOM FEMININE CURSOR -->
   <div class="cursor-dot"></div>
   <div class="cursor-outline"></div>
-
-  <!-- TOP ANNOUNCEMENT BAR -->
-  <div class="announcement-bar">
-    <span><i class="fas fa-sparkles"></i> FREE EXPRESS DELIVERY IN KAMPALA ON ORDERS OVER UGX 60,000</span>
-    <span>✦</span>
-    <span><i class="fab fa-whatsapp"></i> WHATSAPP US DIRECTLY: <strong>+256 700 525 113</strong></span>
-  </div>
 
   <!-- GLASSNAVBAR -->
   <nav class="navbar">
@@ -182,7 +236,7 @@
               <span>(142)</span>
             </div>
             <div class="card-footer">
-              <span class="card-price">UGX 30,000</span>
+              <a href="https://wa.me/256700525113" class="card-price kb-ask" target="_blank"><i class="fab fa-whatsapp"></i> Ask Price</a>
               <button class="btn-add-cart" onclick="addToCart(1)"><i class="fas fa-shopping-bag"></i> Add</button>
             </div>
           </div>
@@ -204,7 +258,7 @@
               <span>(98)</span>
             </div>
             <div class="card-footer">
-              <span class="card-price">UGX 30,000</span>
+              <a href="https://wa.me/256700525113" class="card-price kb-ask" target="_blank"><i class="fab fa-whatsapp"></i> Ask Price</a>
               <button class="btn-add-cart" onclick="addToCart(2)"><i class="fas fa-shopping-bag"></i> Add</button>
             </div>
           </div>
@@ -226,7 +280,7 @@
               <span>(64)</span>
             </div>
             <div class="card-footer">
-              <span class="card-price">UGX 35,000</span>
+              <a href="https://wa.me/256700525113" class="card-price kb-ask" target="_blank"><i class="fab fa-whatsapp"></i> Ask Price</a>
               <button class="btn-add-cart" onclick="addToCart(3)"><i class="fas fa-shopping-bag"></i> Add</button>
             </div>
           </div>
@@ -248,7 +302,7 @@
               <span>(112)</span>
             </div>
             <div class="card-footer">
-              <span class="card-price">UGX 30,000</span>
+              <a href="https://wa.me/256700525113" class="card-price kb-ask" target="_blank"><i class="fab fa-whatsapp"></i> Ask Price</a>
               <button class="btn-add-cart" onclick="addToCart(4)"><i class="fas fa-shopping-bag"></i> Add</button>
             </div>
           </div>
@@ -402,35 +456,106 @@
       <h2 class="section-title">Girl Squad <em>Lookbook</em></h2>
     </div>
 
-    <div class="gallery-grid">
-      <div class="gallery-item">
-        <img src="assets/images/kisha_15.jpg" alt="Squad Model 1">
-        <div class="gallery-overlay">
-          <button class="gallery-btn" onclick="openLightbox('assets/images/kisha_15.jpg')"><i class="fas fa-expand"></i></button>
-          <span><i class="fas fa-heart"></i> 1.2k Likes</span>
+    <div class="kb-show" id="kb-show">
+      <div class="kb-show-stage">
+        <div class="kb-slide active">
+          <img src="assets/images/kisha_01.jpg" alt="Kisha Girl Squad 1">
         </div>
-      </div>
-      <div class="gallery-item">
-        <img src="assets/images/kisha_16.jpg" alt="Squad Model 2">
-        <div class="gallery-overlay">
-          <button class="gallery-btn" onclick="openLightbox('assets/images/kisha_16.jpg')"><i class="fas fa-expand"></i></button>
-          <span><i class="fas fa-heart"></i> 940 Likes</span>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_02.jpg" alt="Kisha Girl Squad 2">
         </div>
-      </div>
-      <div class="gallery-item">
-        <img src="assets/images/kisha_17.jpg" alt="Squad Model 3">
-        <div class="gallery-overlay">
-          <button class="gallery-btn" onclick="openLightbox('assets/images/kisha_17.jpg')"><i class="fas fa-expand"></i></button>
-          <span><i class="fas fa-heart"></i> 1.8k Likes</span>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_03.jpg" alt="Kisha Girl Squad 3">
         </div>
-      </div>
-      <div class="gallery-item">
-        <img src="assets/images/kisha_18.jpg" alt="Squad Model 4">
-        <div class="gallery-overlay">
-          <button class="gallery-btn" onclick="openLightbox('assets/images/kisha_18.jpg')"><i class="fas fa-expand"></i></button>
-          <span><i class="fas fa-heart"></i> 2.1k Likes</span>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_04.jpg" alt="Kisha Girl Squad 4">
         </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_05.jpg" alt="Kisha Girl Squad 5">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_06.jpg" alt="Kisha Girl Squad 6">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_07.jpg" alt="Kisha Girl Squad 7">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_08.jpg" alt="Kisha Girl Squad 8">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_09.jpg" alt="Kisha Girl Squad 9">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_10.jpg" alt="Kisha Girl Squad 10">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_11.jpg" alt="Kisha Girl Squad 11">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_12.jpg" alt="Kisha Girl Squad 12">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_13.jpg" alt="Kisha Girl Squad 13">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_14.jpg" alt="Kisha Girl Squad 14">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_15.jpg" alt="Kisha Girl Squad 15">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_16.jpg" alt="Kisha Girl Squad 16">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_17.jpg" alt="Kisha Girl Squad 17">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_18.jpg" alt="Kisha Girl Squad 18">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_19.jpg" alt="Kisha Girl Squad 19">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_20.jpg" alt="Kisha Girl Squad 20">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_21.jpg" alt="Kisha Girl Squad 21">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_22.jpg" alt="Kisha Girl Squad 22">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_23.jpg" alt="Kisha Girl Squad 23">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_24.jpg" alt="Kisha Girl Squad 24">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_25.jpg" alt="Kisha Girl Squad 25">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_26.jpg" alt="Kisha Girl Squad 26">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_27.jpg" alt="Kisha Girl Squad 27">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_28.jpg" alt="Kisha Girl Squad 28">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_29.jpg" alt="Kisha Girl Squad 29">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_30.jpg" alt="Kisha Girl Squad 30">
+        </div>
+        <div class="kb-slide">
+          <img src="assets/images/kisha_31.jpg" alt="Kisha Girl Squad 31">
+        </div>
+        <button class="kb-show-btn prev" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+        <button class="kb-show-btn next" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+        <button class="kb-show-expand" aria-label="View full size"><i class="fas fa-expand"></i></button>
       </div>
+      <div class="kb-show-count"><span id="kb-show-num">1</span> / 31</div>
     </div>
   </section>
 
@@ -505,6 +630,7 @@
       <p>© 2026 Kisha Lip Gloss Uganda. All rights reserved.</p>
       <p>Crafted with 💕 for Kampala Queens</p>
     </div>
+    <div class="kb-admin-foot"><a href="#" id="kb-admin-link">Owner login</a></div>
   </footer>
 
   <!-- SHOPPING CART DRAWER -->
@@ -518,12 +644,8 @@
       <div class="cart-body" id="cart-body"></div>
 
       <div class="cart-footer">
-        <div class="cart-total-row">
-          <span>Subtotal:</span>
-          <span id="cart-total-amount">UGX 0</span>
-        </div>
         <button class="btn-cta" id="whatsapp-checkout-btn" style="width: 100%; justify-content: center; font-size: 1rem; padding: 16px;">
-          <i class="fab fa-whatsapp"></i> Order via WhatsApp
+          <i class="fab fa-whatsapp"></i> Request Total via WhatsApp
         </button>
       </div>
     </div>
@@ -545,5 +667,505 @@
 
   <!-- JAVASCRIPT ENGINE -->
   <script src="js/app.js"></script>
+
+  <!-- BASKET, WHATSAPP PRICE REQUESTS & OWNER ADMIN -->
+  <script>
+  (function () {
+    'use strict';
+    var WA = '256700525113';
+    var PASS_HASH = 'c4091e95961c8ddf032c7878395365fb6a93b39705f1eecf2228a192a8a90061';
+    var EXCLUDE = '#catalog-grid, #cart-body, #modal-overlay, #toast-notification, .slider-dots, #tester-title, #tester-desc, .cursor-dot, .cursor-outline, .kb-ui, .kb-admin-foot, .kb-show-count, .card-price, #cart-badge, script, style, noscript';
+
+    var content = { texts: {}, names: {}, prices: {} };
+    var basket = [];
+    var textEls = [];          // [{el, key, orig, snip}]
+    var prodMap = {};         // original name -> current display name
+    var pendingPhotos = {};    // path -> dataURL
+    var editing = false, dirty = false, rendering = false;
+
+    function $(s, r) { return (r || document).querySelector(s); }
+    function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+    function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+    function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    function wa(msg) { return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg); }
+    function priceMsg(name) { return 'Hello Kisha Lip Gloss! 💕 How much is the ' + name + '? I would like to order.'; }
+
+    var toastEl, toastT;
+    function toast(m) {
+      if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'kb-toast kb-ui'; document.body.appendChild(toastEl); }
+      toastEl.textContent = m; toastEl.classList.add('show');
+      clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+    }
+
+    function sanitize(html) {
+      var t = document.createElement('template'); t.innerHTML = html;
+      $$('script, iframe, object, embed, style', t.content).forEach(function (n) { n.remove(); });
+      $$('*', t.content).forEach(function (n) {
+        Array.prototype.slice.call(n.attributes).forEach(function (a) {
+          if (/^on/i.test(a.name) || /^\s*javascript:/i.test(a.value)) n.removeAttribute(a.name);
+        });
+      });
+      return t.innerHTML;
+    }
+
+    /* ---------- PRODUCTS & PRICES ---------- */
+    function displayName(orig) { return content.names[orig] || prodMap[orig] || orig; }
+    function origFromDisplay(name) {
+      for (var o in prodMap) { if (o === name || displayName(o) === name) return o; }
+      return name;
+    }
+    function makeSlot(orig) {
+      var price = content.prices[orig], el;
+      if (price) { el = document.createElement('span'); el.textContent = price; }
+      else {
+        el = document.createElement('a'); el.target = '_blank'; el.className = 'kb-ask';
+        el.href = wa(priceMsg(displayName(orig)));
+        el.innerHTML = '<i class="fab fa-whatsapp"></i> Ask Price';
+      }
+      el.classList.add('card-price'); el.setAttribute('data-kb-slot', orig);
+      return el;
+    }
+    function refreshSlots() {
+      $$('[data-kb-slot]').forEach(function (s) { s.replaceWith(makeSlot(s.getAttribute('data-kb-slot'))); });
+    }
+    var PRICE_RE = /UGX\s*[\d.,]+\s*(k|K)?/;
+    function stripPrices(root, orig) {
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [], n;
+      while ((n = walker.nextNode())) { if (PRICE_RE.test(n.nodeValue)) nodes.push(n); }
+      nodes.forEach(function (t) {
+        var p = t.parentElement; if (!p || p.closest('[data-kb-slot]')) return;
+        if (p.textContent.trim().replace(PRICE_RE, '').trim() === '' && p !== root) {
+          p.replaceWith(orig ? makeSlot(orig) : document.createElement('span'));
+        } else {
+          t.nodeValue = t.nodeValue.replace(new RegExp(PRICE_RE.source, 'g'), '');
+        }
+      });
+    }
+    function processCard(card) {
+      if (card.hasAttribute('data-kb-done')) return;
+      card.setAttribute('data-kb-done', '1');
+      var titleEl = $('.card-title', card);
+      var orig = titleEl ? titleEl.textContent.trim() : '';
+      if (!orig) return;
+      card.setAttribute('data-kb-name', orig);
+      prodMap[orig] = prodMap[orig] || orig;
+      var inCatalog = !!card.closest('#catalog-grid');
+      if (inCatalog && titleEl) {
+        titleEl.setAttribute('data-kb-cat', orig);
+        if (content.names[orig]) titleEl.textContent = content.names[orig];
+        if (editing) { titleEl.contentEditable = 'true'; titleEl.classList.add('kb-editable'); }
+      }
+      var priceEl = $('.card-price', card);
+      if (priceEl) priceEl.replaceWith(makeSlot(orig));
+      stripPrices(card, orig);
+      $$('img', card).forEach(applyPendingPhoto);
+    }
+    function processModal() {
+      var body = $('#modal-body'); if (!body) return;
+      var h = $('h1, h2, h3, h4', body);
+      var orig = h ? origFromDisplay(h.textContent.trim()) : '';
+      stripPrices(body, orig || null);
+    }
+
+    /* ---------- BASKET ---------- */
+    function loadBasket() { try { basket = JSON.parse(store('kb_basket') || '[]') || []; } catch (e) { basket = []; } }
+    function saveBasket() { store('kb_basket', JSON.stringify(basket)); }
+    function addItem(name, img) {
+      if (!name) return;
+      var it = basket.filter(function (b) { return b.name === name; })[0];
+      if (it) it.qty++; else basket.push({ name: name, img: img || '', qty: 1 });
+      saveBasket(); renderBasket(); toast(name + ' added to your basket 💕');
+    }
+    function renderBasket() {
+      var body = $('#cart-body'), badge = $('#cart-badge');
+      var count = basket.reduce(function (a, b) { return a + b.qty; }, 0);
+      if (badge) badge.textContent = count;
+      if (!body) return;
+      rendering = true;
+      if (!basket.length) {
+        body.innerHTML = '<div class="kb-empty"><i class="fas fa-shopping-bag"></i><p>Your basket is empty</p><span>Tap “Add” on any product to start your basket.</span></div>';
+      } else {
+        body.innerHTML = basket.map(function (b, i) {
+          return '<div class="kb-item">' + (b.img ? '<img src="' + esc(b.img) + '" alt="">' : '') +
+            '<div class="kb-item-info"><h5>' + esc(b.name) + '</h5><div class="kb-qty">' +
+            '<button data-kb-act="dec" data-i="' + i + '">−</button><span>' + b.qty + '</span>' +
+            '<button data-kb-act="inc" data-i="' + i + '">+</button></div></div>' +
+            '<button class="kb-remove" data-kb-act="del" data-i="' + i + '" title="Remove"><i class="fas fa-trash"></i></button></div>';
+        }).join('') + '<p class="kb-note">We’ll send you the total for these items on WhatsApp.</p>';
+      }
+      setTimeout(function () { rendering = false; }, 0);
+    }
+    function checkout() {
+      if (!basket.length) { toast('Your basket is empty'); return; }
+      var lines = basket.map(function (b, i) { return (i + 1) + '. ' + b.name + ' × ' + b.qty; }).join('\n');
+      window.open(wa('Hello Kisha Lip Gloss! 💕 I would like to order:\n\n' + lines + '\n\nPlease send me the total price and delivery details. Thank you!'), '_blank');
+    }
+    function cardInfo(card) {
+      var t = $('.card-title', card), img = $('.card-img-wrap img, img', card);
+      return { name: t ? t.textContent.trim() : '', img: img ? img.getAttribute('src') : '' };
+    }
+    // Any other addToCart(id) calls from app.js now fill the basket
+    window.addToCart = function (id) {
+      var list = null;
+      try { list = (0, eval)('typeof products !== "undefined" ? products : null'); } catch (e) { list = null; }
+      var p = Array.isArray(list) ? list.filter(function (x) { return String(x.id) === String(id); })[0] : null;
+      if (p) addItem(p.name || p.title, p.image || p.img || '');
+    };
+
+    /* ---------- CLICK HANDLING (capture, runs before app.js) ---------- */
+    window.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!(t instanceof Element) || t.closest('.kb-ui')) return;
+
+      if (editing) {
+        var img = t.tagName === 'IMG' ? t : null;
+        if (img && img.hasAttribute('data-kb-photo')) { e.preventDefault(); e.stopPropagation(); pickPhoto(img.getAttribute('data-kb-photo')); return; }
+        if (t.closest('.kb-show-btn, .slider-arrow, .slider-dots, .tab-btn, #cart-toggle-btn, #cart-close-btn, #mobile-toggle, #modal-close')) return;
+        if (t.closest('a, button, .product-card, .shade-option-card')) { e.preventDefault(); e.stopPropagation(); }
+        return;
+      }
+
+      if (t.closest('#whatsapp-checkout-btn')) { e.preventDefault(); e.stopPropagation(); checkout(); return; }
+
+      var act = t.closest('[data-kb-act]');
+      if (act) {
+        e.stopPropagation(); var i = +act.getAttribute('data-i');
+        if (act.getAttribute('data-kb-act') === 'inc') basket[i].qty++;
+        else if (act.getAttribute('data-kb-act') === 'dec') { basket[i].qty--; if (basket[i].qty < 1) basket.splice(i, 1); }
+        else basket.splice(i, 1);
+        saveBasket(); renderBasket(); return;
+      }
+
+      if (t.closest('#tester-add-btn')) {
+        e.preventDefault(); e.stopPropagation();
+        var tt = $('#tester-title'), ti = $('#tester-img');
+        addItem(tt ? tt.textContent.trim() : '', ti ? ti.getAttribute('src') : ''); return;
+      }
+
+      var addBtn = t.closest('.btn-add-cart');
+      if (addBtn) {
+        var card = addBtn.closest('.product-card');
+        if (card) { e.preventDefault(); e.stopPropagation(); var ci = cardInfo(card); addItem(ci.name, ci.img); return; }
+      }
+
+      var modalBtn = t.closest('#modal-body button, #modal-body a');
+      if (modalBtn && /add|bag|cart|basket/i.test(modalBtn.textContent) && !modalBtn.closest('[data-kb-slot]')) {
+        var mb = $('#modal-body'), mh = $('h1, h2, h3, h4', mb), mi = $('img', mb);
+        if (mh) { e.preventDefault(); e.stopPropagation(); addItem(mh.textContent.trim(), mi ? mi.getAttribute('src') : ''); return; }
+      }
+
+      // Click a product to ask its price on WhatsApp
+      var pc = t.closest('.product-card');
+      if (pc && !t.closest('a, button, input, .card-wishlist, .quick-view-btn')) {
+        e.preventDefault(); e.stopPropagation();
+        window.open(wa(priceMsg(cardInfo(pc).name)), '_blank');
+      }
+    }, true);
+
+    /* ---------- EDITABLE TEXT ---------- */
+    function collectText() {
+      var all = $$('body *').filter(function (el) {
+        if (el.closest(EXCLUDE)) return false;
+        for (var i = 0; i < el.childNodes.length; i++) {
+          var c = el.childNodes[i];
+          if (c.nodeType === 3 && c.nodeValue.trim()) return true;
+        }
+        return false;
+      });
+      var set = new Set();
+      all.forEach(function (el) {
+        var p = el.parentElement, inside = false;
+        while (p) { if (set.has(p)) { inside = true; break; } p = p.parentElement; }
+        if (!inside) set.add(el);
+      });
+      var i = 0;
+      set.forEach(function (el) {
+        textEls.push({ el: el, key: String(i++), orig: el.innerHTML, snip: el.textContent.trim().slice(0, 40) });
+      });
+    }
+    function applyContent() {
+      textEls.forEach(function (t) {
+        var c = content.texts[t.key];
+        if (c && c.o === t.snip && typeof c.h === 'string') t.el.innerHTML = sanitize(c.h);
+      });
+      $$('[data-kb-cat]').forEach(function (el) {
+        var o = el.getAttribute('data-kb-cat'); if (content.names[o]) el.textContent = content.names[o];
+      });
+      refreshSlots();
+    }
+    function setEditing(on) {
+      editing = on;
+      document.body.classList.toggle('kb-editing', on);
+      textEls.forEach(function (t) { t.el.contentEditable = on ? 'true' : 'false'; t.el.classList.toggle('kb-editable', on); });
+      $$('[data-kb-cat]').forEach(function (el) { el.contentEditable = on ? 'true' : 'false'; el.classList.toggle('kb-editable', on); });
+      var b = $('#kb-edit'); if (b) { b.classList.toggle('on', on); b.textContent = on ? '✎ Editing ON' : '✎ Edit Text'; }
+    }
+    document.addEventListener('input', function (e) {
+      if (editing && e.target instanceof Element && e.target.closest('.kb-editable')) { dirty = true; status('Unpublished changes'); }
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target instanceof Element && e.target.closest('[data-kb-cat]');
+      if (editing && el) { var o = el.getAttribute('data-kb-cat'), v = el.textContent.trim(); if (v && v !== o) content.names[o] = v; else delete content.names[o]; refreshSlots(); }
+    });
+    document.addEventListener('paste', function (e) {
+      if (!editing || !(e.target instanceof Element) || !e.target.closest('.kb-editable')) return;
+      e.preventDefault();
+      document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text'));
+    });
+    window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+    /* ---------- PHOTOS ---------- */
+    function tagPhotos() {
+      $$('img').forEach(function (img) {
+        if (img.closest('.kb-ui')) return;
+        var src = img.getAttribute('data-kb-photo') || img.getAttribute('src') || '';
+        if (src.indexOf('assets/images/') === 0) img.setAttribute('data-kb-photo', src);
+      });
+    }
+    function applyPendingPhoto(img) {
+      var src = img.getAttribute('data-kb-photo') || img.getAttribute('src') || '';
+      if (src.indexOf('assets/images/') !== 0) return;
+      img.setAttribute('data-kb-photo', src);
+      if (pendingPhotos[src]) img.src = pendingPhotos[src];
+    }
+    function allPhotoPaths() {
+      var s = new Set();
+      for (var i = 1; i <= 31; i++) s.add('assets/images/kisha_' + (i < 10 ? '0' : '') + i + '.jpg');
+      $$('img[data-kb-photo]').forEach(function (img) { s.add(img.getAttribute('data-kb-photo')); });
+      return Array.from(s).sort();
+    }
+    function pickPhoto(path) {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+      inp.onchange = function () { if (inp.files[0]) loadPhoto(path, inp.files[0]); };
+      inp.click();
+    }
+    function loadPhoto(path, file) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var max = 1600, w = im.width, h = im.height, r = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(h * r);
+        var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(im, 0, 0, c.width, c.height);
+        pendingPhotos[path] = c.toDataURL('image/jpeg', 0.85);
+        URL.revokeObjectURL(url);
+        $$('img[data-kb-photo="' + path + '"]').forEach(function (i) { i.src = pendingPhotos[path]; });
+        dirty = true; status('Unpublished changes'); toast('Photo replaced — click Publish to save');
+        if ($('#kb-photos-back').classList.contains('open')) openPhotos();
+      };
+      im.src = url;
+    }
+
+    /* ---------- GITHUB PUBLISH ---------- */
+    function cfg() {
+      var c = {}; try { c = JSON.parse(store('kb_gh') || '{}') || {}; } catch (e) {}
+      if (!c.owner && /\.github\.io$/i.test(location.hostname)) {
+        c.owner = location.hostname.split('.')[0];
+        var seg = location.pathname.split('/').filter(Boolean)[0];
+        c.repo = seg && !/\.html?$/i.test(seg) ? seg : c.owner + '.github.io';
+      }
+      c.branch = c.branch || 'main'; c.dir = c.dir || '';
+      return c;
+    }
+    function repoPath(p) { var c = cfg(); return (c.dir ? c.dir.replace(/^\/|\/$/g, '') + '/' : '') + p; }
+    function api(path) { var c = cfg(); return 'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/'); }
+    function headers() { return { 'Authorization': 'Bearer ' + cfg().token, 'Accept': 'application/vnd.github+json' }; }
+    async function putFile(path, b64, msg) {
+      var c = cfg(), sha = null;
+      var g = await fetch(api(path) + '?ref=' + encodeURIComponent(c.branch), { headers: headers(), cache: 'no-store' });
+      if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) throw new Error('GitHub said ' + g.status + ' for ' + path);
+      var body = { message: msg, content: b64, branch: c.branch }; if (sha) body.sha = sha;
+      var r = await fetch(api(path), { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+      if (!r.ok) throw new Error('GitHub said ' + r.status + ' for ' + path);
+    }
+    function b64utf8(s) { return btoa(unescape(encodeURIComponent(s))); }
+    async function publish() {
+      var c = cfg();
+      if (!c.owner || !c.repo || !c.token) { openSettings('Add your GitHub details once so changes go live for everyone.'); return; }
+      var texts = {};
+      textEls.forEach(function (t) { if (t.el.innerHTML !== t.orig) texts[t.key] = { o: t.snip, h: sanitize(t.el.innerHTML) }; });
+      content.texts = texts;
+      try {
+        var paths = Object.keys(pendingPhotos), n = 0;
+        for (var i = 0; i < paths.length; i++) {
+          status('Uploading photo ' + (++n) + ' of ' + paths.length + '…');
+          await putFile(repoPath(paths[i]), pendingPhotos[paths[i]].split(',')[1], 'Replace ' + paths[i] + ' (site admin)');
+        }
+        status('Saving text & prices…');
+        await putFile(repoPath('content.json'), b64utf8(JSON.stringify({ version: 1, updated: new Date().toISOString(), texts: content.texts, names: content.names, prices: content.prices }, null, 2)), 'Update site content (site admin)');
+        pendingPhotos = {}; dirty = false;
+        status('Published ✓ live in a few minutes'); toast('Published! Changes go live in a few minutes.');
+      } catch (err) {
+        status('Publish failed'); alertBox('Publish failed: ' + err.message + '. Check your GitHub settings and token.');
+      }
+    }
+
+    /* ---------- ADMIN UI ---------- */
+    function status(m) { var s = $('#kb-status'); if (s) s.textContent = m; }
+    function alertBox(m) { $('#kb-msg-text').textContent = m; open('kb-msg-back'); }
+    function open(id) { $('#' + id).classList.add('open'); }
+    function close(id) { $('#' + id).classList.remove('open'); }
+    function buildUI() {
+      var w = document.createElement('div'); w.className = 'kb-ui';
+      w.innerHTML =
+        '<div class="kb-back" id="kb-login-back"><div class="kb-box" style="max-width:380px"><button class="kb-x" data-close="kb-login-back">×</button>' +
+        '<h3>Owner login</h3><input type="password" id="kb-pass" placeholder="Password" autocomplete="current-password">' +
+        '<div class="kb-err" id="kb-login-err"></div><button class="kb-btn" id="kb-login-go" style="width:100%">Log in</button></div></div>' +
+
+        '<div class="kb-back" id="kb-photos-back"><div class="kb-box"><button class="kb-x" data-close="kb-photos-back">×</button>' +
+        '<h3>Photos</h3><p>Replace any photo. The new one keeps the same file name, so it changes everywhere that photo is used. Gold border = not published yet.</p>' +
+        '<div class="kb-photos" id="kb-photos"></div></div></div>' +
+
+        '<div class="kb-back" id="kb-prices-back"><div class="kb-box"><button class="kb-x" data-close="kb-prices-back">×</button>' +
+        '<h3>Prices (optional)</h3><p>Leave a price blank to keep it hidden — customers will see “Ask Price” and message you on WhatsApp. Type a price (e.g. UGX 30,000) to show it on that product.</p>' +
+        '<div id="kb-prices"></div></div></div>' +
+
+        '<div class="kb-back" id="kb-set-back"><div class="kb-box"><button class="kb-x" data-close="kb-set-back">×</button>' +
+        '<h3>GitHub publishing</h3><p id="kb-set-note"></p>' +
+        '<p>Changes are saved to the GitHub repo that hosts this site. You need a GitHub token (one time): GitHub → Settings → Developer settings → Fine-grained tokens → choose this repository only → Permissions: <b>Contents: Read and write</b>. The token stays on this device only.</p>' +
+        '<label>GitHub username / organisation</label><input type="text" id="kb-owner">' +
+        '<label>Repository name</label><input type="text" id="kb-repo">' +
+        '<label>Branch</label><input type="text" id="kb-branch">' +
+        '<label>Folder of the site inside the repo (blank if index.html is at the top)</label><input type="text" id="kb-dir">' +
+        '<label>Token</label><input type="password" id="kb-token">' +
+        '<button class="kb-btn" id="kb-set-save">Save settings</button></div></div>' +
+
+        '<div class="kb-back" id="kb-msg-back"><div class="kb-box" style="max-width:420px"><button class="kb-x" data-close="kb-msg-back">×</button><p id="kb-msg-text"></p></div></div>' +
+
+        '<div class="kb-bar" id="kb-bar"><button id="kb-edit">✎ Edit Text</button><button id="kb-photos-btn">🖼 Photos</button>' +
+        '<button id="kb-prices-btn">UGX Prices</button><button class="pub" id="kb-publish">Publish</button>' +
+        '<button id="kb-set-btn" title="GitHub settings">⚙</button><button id="kb-logout">Log out</button><span class="kb-status" id="kb-status"></span></div>';
+      document.body.appendChild(w);
+
+      w.addEventListener('click', function (e) { var c = e.target.closest('[data-close]'); if (c) close(c.getAttribute('data-close')); });
+      $$('.kb-back', w).forEach(function (b) { b.addEventListener('click', function (e) { if (e.target === b) b.classList.remove('open'); }); });
+      $('#kb-login-go').onclick = login;
+      $('#kb-pass').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
+      $('#kb-edit').onclick = function () { setEditing(!editing); if (editing) toast('Click any text to edit it. Click a photo to replace it.'); };
+      $('#kb-photos-btn').onclick = openPhotos;
+      $('#kb-prices-btn').onclick = openPrices;
+      $('#kb-publish').onclick = publish;
+      $('#kb-set-btn').onclick = function () { openSettings(''); };
+      $('#kb-set-save').onclick = function () {
+        store('kb_gh', JSON.stringify({ owner: $('#kb-owner').value.trim(), repo: $('#kb-repo').value.trim(), branch: $('#kb-branch').value.trim() || 'main', dir: $('#kb-dir').value.trim(), token: $('#kb-token').value.trim() }));
+        close('kb-set-back'); toast('Settings saved');
+      };
+      $('#kb-logout').onclick = function () {
+        if (dirty && !confirm('You have unpublished changes. Log out anyway?')) return;
+        setEditing(false); try { sessionStorage.removeItem('kb_admin'); } catch (e) {}
+        $('#kb-bar').classList.remove('open');
+        if (dirty) location.reload();
+      };
+      $('#kb-admin-link').addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isAdmin()) { $('#kb-bar').classList.add('open'); return; }
+        $('#kb-login-err').textContent = ''; $('#kb-pass').value = ''; open('kb-login-back'); setTimeout(function () { $('#kb-pass').focus(); }, 50);
+      });
+    }
+    function isAdmin() { try { return sessionStorage.getItem('kb_admin') === '1'; } catch (e) { return false; } }
+    async function sha256(s) {
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
+    async function login() {
+      var ok = false;
+      try { ok = (await sha256($('#kb-pass').value)) === PASS_HASH; } catch (e) { $('#kb-login-err').textContent = 'Please open the site over https to log in.'; return; }
+      if (!ok) { $('#kb-login-err').textContent = 'Wrong password'; return; }
+      try { sessionStorage.setItem('kb_admin', '1'); } catch (e) {}
+      close('kb-login-back'); $('#kb-bar').classList.add('open'); toast('Welcome back! 💕');
+    }
+    function openSettings(note) {
+      var c = cfg();
+      $('#kb-set-note').textContent = note || '';
+      $('#kb-owner').value = c.owner || ''; $('#kb-repo').value = c.repo || ''; $('#kb-branch').value = c.branch || 'main';
+      $('#kb-dir').value = c.dir || ''; $('#kb-token').value = c.token || '';
+      open('kb-set-back');
+    }
+    function openPhotos() {
+      var g = $('#kb-photos');
+      g.innerHTML = allPhotoPaths().map(function (p) {
+        return '<div class="kb-photo' + (pendingPhotos[p] ? ' pending' : '') + '"><img src="' + esc(pendingPhotos[p] || p) + '" alt="">' +
+          esc(p.split('/').pop()) + '<br><label>Replace<input type="file" accept="image/*" hidden data-path="' + esc(p) + '"></label></div>';
+      }).join('');
+      $$('input[type=file]', g).forEach(function (inp) { inp.onchange = function () { if (inp.files[0]) loadPhoto(inp.getAttribute('data-path'), inp.files[0]); }; });
+      open('kb-photos-back');
+    }
+    function openPrices() {
+      var box = $('#kb-prices'), names = Object.keys(prodMap);
+      Object.keys(content.prices).forEach(function (n) { if (names.indexOf(n) < 0) names.push(n); });
+      box.innerHTML = names.map(function (n) {
+        return '<div class="kb-price-row"><span>' + esc(displayName(n)) + '</span><input type="text" placeholder="Hidden (Ask Price)" value="' + esc(content.prices[n] || '') + '" data-name="' + esc(n) + '"></div>';
+      }).join('') || '<p>No products found.</p>';
+      $$('input', box).forEach(function (inp) {
+        inp.oninput = function () {
+          var n = inp.getAttribute('data-name'), v = inp.value.trim();
+          if (v) content.prices[n] = v; else delete content.prices[n];
+          refreshSlots(); dirty = true; status('Unpublished changes');
+        };
+      });
+      open('kb-prices-back');
+    }
+
+    /* ---------- INIT ---------- */
+    function init() {
+      collectText();
+      tagPhotos();
+      $$('.product-card').forEach(processCard);
+      var grid = $('#catalog-grid');
+      if (grid) new MutationObserver(function () { $$('.product-card', grid).forEach(processCard); tagPhotos(); }).observe(grid, { childList: true, subtree: true });
+      var modal = $('#modal-body');
+      if (modal) new MutationObserver(function (m, obs) { obs.disconnect(); processModal(); tagPhotos(); obs.observe(modal, { childList: true, subtree: true, characterData: true }); }).observe(modal, { childList: true, subtree: true, characterData: true });
+      var cartBody = $('#cart-body');
+      if (cartBody) new MutationObserver(function () { if (!rendering) renderBasket(); }).observe(cartBody, { childList: true });
+      var badge = $('#cart-badge');
+      if (badge) new MutationObserver(function () {
+        var c = String(basket.reduce(function (a, b) { return a + b.qty; }, 0));
+        if (badge.textContent !== c) badge.textContent = c;
+      }).observe(badge, { childList: true, characterData: true, subtree: true });
+
+      loadBasket(); renderBasket(); buildUI();
+      if (isAdmin()) $('#kb-bar').classList.add('open');
+
+      fetch('content.json?v=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          if (!j) return;
+          content.texts = j.texts || {}; content.names = j.names || {}; content.prices = j.prices || {};
+          applyContent();
+        })
+        .catch(function () {});
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+  </script>
+  <!-- LOOKBOOK ROTATING SHOWCASE -->
+  <script>
+  (function () {
+    var show = document.getElementById('kb-show'); if (!show) return;
+    var slides = show.querySelectorAll('.kb-slide'), num = document.getElementById('kb-show-num');
+    var i = 0, timer = null, DELAY = 4000;
+    function go(n) {
+      slides[i].classList.remove('active');
+      i = (n + slides.length) % slides.length;
+      slides[i].classList.add('active');
+      num.textContent = i + 1;
+    }
+    function play() { stop(); timer = setInterval(function () { go(i + 1); }, DELAY); }
+    function stop() { clearInterval(timer); }
+    show.querySelector('.prev').addEventListener('click', function () { go(i - 1); play(); });
+    show.querySelector('.next').addEventListener('click', function () { go(i + 1); play(); });
+    show.querySelector('.kb-show-expand').addEventListener('click', function () {
+      var src = slides[i].querySelector('img').getAttribute('src');
+      if (typeof openLightbox === 'function') openLightbox(src); else window.open(src, '_blank');
+    });
+    show.addEventListener('mouseenter', stop);
+    show.addEventListener('mouseleave', play);
+    var x0 = null;
+    show.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; stop(); }, { passive: true });
+    show.addEventListener('touchend', function (e) {
+      if (x0 !== null) { var dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1); }
+      x0 = null; play();
+    });
+    play();
+  })();
+  </script>
 </body>
 </html>
