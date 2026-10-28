@@ -75,6 +75,11 @@
     .kb-show-btn.prev { left: 14px; }
     .kb-show-btn.next { right: 14px; }
     .kb-show-expand { top: 14px; right: 14px; width: 38px; height: 38px; font-size: 0.85rem; }
+    .kb-show-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+    .kb-show-add, .kb-show-order { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 40px; font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: transform .2s; }
+    .kb-show-add { background: #D81B60; color: #fff; border: 1px solid #D81B60; }
+    .kb-show-order { background: transparent; color: #D81B60; border: 1px solid #D81B60; }
+    .kb-show-add:hover, .kb-show-order:hover { transform: translateY(-2px); }
     .kb-show-count { text-align: center; margin-top: 14px; font-size: 0.85rem; letter-spacing: 2px; opacity: 0.7; }
   </style>
 </head>
@@ -501,6 +506,10 @@
         <button class="kb-show-btn next" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
         <button class="kb-show-expand" aria-label="View full size"><i class="fas fa-expand"></i></button>
       </div>
+      <div class="kb-show-actions">
+        <button class="kb-show-add" id="kb-show-add"><i class="fas fa-shopping-bag"></i> Add to Basket</button>
+        <button class="kb-show-order" id="kb-show-order"><i class="fab fa-whatsapp"></i> Order on WhatsApp</button>
+      </div>
       <div class="kb-show-count"><span id="kb-show-num">1</span> / 13</div>
     </div>
   </section>
@@ -620,7 +629,7 @@
     'use strict';
     var WA = '256700525113';
     var PASS_HASH = 'c4091e95961c8ddf032c7878395365fb6a93b39705f1eecf2228a192a8a90061';
-    var EXCLUDE = '#catalog-grid, #cart-body, #modal-overlay, #toast-notification, .slider-dots, #tester-title, #tester-desc, .cursor-dot, .cursor-outline, .kb-ui, .kb-admin-foot, .kb-show-count, .card-price, #cart-badge, script, style, noscript';
+    var EXCLUDE = '#catalog-grid, #cart-body, #modal-overlay, #toast-notification, .slider-dots, #tester-title, #tester-desc, .cursor-dot, .cursor-outline, .kb-ui, .kb-admin-foot, .kb-show-count, .kb-show-actions, .card-price, #cart-badge, script, style, noscript';
 
     var content = { texts: {}, names: {}, prices: {} };
     var basket = [];
@@ -743,7 +752,11 @@
     }
     function checkout() {
       if (!basket.length) { toast('Your basket is empty'); return; }
-      var lines = basket.map(function (b, i) { return (i + 1) + '. ' + b.name + ' × ' + b.qty; }).join('\n');
+      var lines = basket.map(function (b, i) {
+        var line = (i + 1) + '. ' + b.name + ' × ' + b.qty;
+        if (/^Kisha Look #/.test(b.name) && b.img) line += '\n   Photo: ' + new URL(b.img, location.href).href;
+        return line;
+      }).join('\n');
       window.open(wa('Hello Kisha Lip Gloss! 💕 I would like to order:\n\n' + lines + '\n\nPlease send me the total price and delivery details. Thank you!'), '_blank');
     }
     function cardInfo(card) {
@@ -757,6 +770,9 @@
       var p = Array.isArray(list) ? list.filter(function (x) { return String(x.id) === String(id); })[0] : null;
       if (p) addItem(p.name || p.title, p.image || p.img || '');
     };
+
+    window.kbAddToBasket = addItem;
+    window.kbWhatsApp = wa;
 
     /* ---------- CLICK HANDLING (capture, runs before app.js) ---------- */
     window.addEventListener('click', function (e) {
@@ -1101,6 +1117,19 @@
     show.querySelector('.kb-show-expand').addEventListener('click', function () {
       var src = slides[i].querySelector('img').getAttribute('src');
       if (typeof openLightbox === 'function') openLightbox(src); else window.open(src, '_blank');
+    });
+    function current() {
+      var src = slides[i].querySelector('img').getAttribute('src');
+      var m = src.match(/kisha_(\d+)/);
+      return { name: 'Kisha Look #' + (m ? parseInt(m[1], 10) : i + 1), src: src };
+    }
+    document.getElementById('kb-show-add').addEventListener('click', function () {
+      var c = current(); if (window.kbAddToBasket) window.kbAddToBasket(c.name, c.src);
+    });
+    document.getElementById('kb-show-order').addEventListener('click', function () {
+      var c = current(), photo = new URL(c.src, location.href).href;
+      var msg = 'Hello Kisha Lip Gloss! 💕 I would like to order ' + c.name + ' from your Lookbook.\nPhoto: ' + photo + '\n\nPlease send me the price and delivery details. Thank you!';
+      window.open(window.kbWhatsApp ? window.kbWhatsApp(msg) : 'https://wa.me/256700525113?text=' + encodeURIComponent(msg), '_blank');
     });
     show.addEventListener('mouseenter', stop);
     show.addEventListener('mouseleave', play);
